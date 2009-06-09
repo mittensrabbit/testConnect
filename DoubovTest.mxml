@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" backgroundColor="white" backgroundImage="" applicationComplete="init()">
+<mx:Script>
+	<![CDATA[
+		import com.facebook.data.users.GetInfoData;
+		import com.facebook.data.users.FacebookUser;
+		import com.facebook.data.FacebookEducationInfo;
+		import com.facebook.commands.users.GetInfo;
+		import com.facebook.net.FacebookCall;
+		import com.facebook.Facebook;
+		import com.facebook.utils.FacebookSessionUtil;
+		import com.facebook.events.FacebookEvent;
+		import com.facebook.net.FacebookCall;
+		import com.facebook.commands.users.GetInfo;
+		import com.facebook.data.users.GetInfoFieldValues;
+		
+		private var fbook:Facebook;
+		private var session:FacebookSessionUtil;
+		private var user:FacebookUser;
+		
+		private function onConnect(e:FacebookEvent):void
+		{
+			var call:FacebookCall = fbook.post(new GetInfo([fbook.uid],[GetInfoFieldValues.ALL_VALUES]));
+			call.addEventListener(FacebookEvent.COMPLETE, onGetInfo);
+		}
+		
+		private function onGetInfo(e:FacebookEvent):void
+		{
+			user = (e.data as GetInfoData).userCollection.getItemAt(0) as FacebookUser;
+			this.helloText.text = "Hey " + user.first_name + " " + user.last_name;		
+		}
+		
+		private function init():void
+		{
+			session = new FacebookSessionUtil("98463eef1e0e4f099e588c510aaaaa03","1f83097c606f4245af4b3588df3c1eb9",loaderInfo);
+			fbook = session.facebook;
+			session.addEventListener(FacebookEvent.CONNECT, onConnect);
+			session.login();
+		}
+		
+	
+		
+		private function onConfirmLogin():void
+		{
+			this.removeChild(loginButton);
+			//this.helloText.text = "Okay you logged in!";
+			session.validateLogin();
+		}
+	]]>
+</mx:Script>
+	<mx:Label x="308" y="100" text="Hello sucker!" id="helloText"/>
+	<mx:Button id="loginButton" label="Click after logging in" click="onConfirmLogin()"/>
+	
+</mx:Application>
